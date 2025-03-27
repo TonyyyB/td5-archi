@@ -1,28 +1,17 @@
 <script>
 export default {
     name: "QuestionnaireList",
-    props: {
-        api: {
-            type: Object,
-            required: true
-        }
-    },
     data() {
         return {
             questionnaires: []
         };
     },
-    created() {
+    mounted() {
         this.loadQuestionnaires();
     },
     methods: {
-        async loadQuestionnaires() {
-            try {
-                this.questionnaires = await this.api.getQuestionnaires();
-                console.log(this.questionnaires);
-            } catch (error) {
-                this.$emit('error', error);
-            }
+        loadQuestionnaires() {
+
         },
         viewQuestionnaire(questionnaire) {
 

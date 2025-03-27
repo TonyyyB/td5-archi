@@ -1,17 +1,21 @@
 <script>
 import API from './services/API.js';
 import QuestionnaireList from './components/QuestionnaireList.vue';
+import { RouterView } from 'vue-router';
 export default {
   name: "App",
   data() {
     return {
-      api: new API()
+      api: new API("http://127.0.0.1:5000/todo/api/v1.0/")
     }
   },
   created() {
   },
   methods: {
 
+  },
+  components: {
+    QuestionnaireList
   }
 };
 </script>
@@ -21,9 +25,7 @@ export default {
       <h1>Application de gestion de questionnaires</h1>
     </header>
     <main>
-      <QuestionnaireList>
-
-      </QuestionnaireList>
+      <RouterView />
     </main>
   </div>
 </template>
