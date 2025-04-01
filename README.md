@@ -1,5 +1,44 @@
-# Vue 3 + TypeScript + Vite
+# TP Noté architecture logicielle
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Membres du groupe
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+Lobjois Mathéo
+
+Beaujouan tony
+
+## Installation et lancement de l'application
+
+
+## Fonctionnalités
+
+### Questionnaire
+
+Nous pouvons ajouter un nouveau questionnaire, le modifier ou encore le supprimer.
+
+### Question
+
+Nous pouvons ajouter une nouvelle question à un questionnaire, la modifier ou encore la supprimer.
+
+### Arborescence du projet (src)
+
+```bash
+├── App.vue
+├── assets
+│   └── vue.svg
+├── components
+│   ├── QuestionItems.vue
+│   ├── QuestionList.vue
+│   ├── QuestionnaireItems.vue
+│   └── QuestionnaireList.vue
+├── main.js
+├── services
+│   └── apiService.js
+├── style.css
+└── types
+    └── index.js
+
+```
+
+Nous avons quatres composants.
+
+Deux pour les questionnaires (```QuestionnaireList.vue```,```QuestionnaireItems.vue``` ) et deux autres pour les questions (```QuestionList.vue```,```QuestionItems.vue``` ). Utilisés dans le ```App.vue```.
