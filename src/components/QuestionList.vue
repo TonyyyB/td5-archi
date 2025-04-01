@@ -1,57 +1,57 @@
 <template>
-    <div class="question-list">
-        <h2>{{ questionnaire.name }}</h2>
-        <div v-if="loading" class="loading">Chargement...</div>
-        <div v-else-if="error" class="error">{{ error }}</div>
-        <div v-else>
-            <div v-for="question in questions" :key="question.id" class="question-item">
-                <div class="question-details">
-                    <h3>{{ question.title }}</h3>
-                    <p>Ordre: {{ question.order }}</p>
-                    <p>Type: {{ question.type }}</p>
-                </div>
-                <div class="question-actions">
-                    <button @click="editQuestion(question)">Modifier</button>
-                    <button @click="deleteQuestion(question)">Supprimer</button>
-                </div>
-            </div>
+  <div class="question-list">
+    <h2>{{ questionnaire.name }}</h2>
+    <div v-if="loading" class="loading">Chargement...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
+    <div v-else>
+      <div v-for="question in questions" :key="question.id" class="question-item">
+        <div class="question-details">
+          <h3>{{ question.title }}</h3>
+          <p>Ordre: {{ question.order }}</p>
+          <p>Type: {{ question.type }}</p>
         </div>
-        <div class="questionnaire-actions">
-            <button @click="showAddQuestionModal = true">
-                Ajouter une question
-            </button>
-            <button @click="editQuestionnaire">
-                Modifier le questionnaire
-            </button>
-            <button @click="deleteCurrentQuestionnaire">
-                Supprimer le questionnaire
-            </button>
+        <div class="question-actions">
+          <button @click="editQuestion(question)">Modifier</button>
+          <button @click="deleteQuestion(question)">Supprimer</button>
         </div>
-
-        <!-- Modal d'ajout de question -->
-        <div v-if="showAddQuestionModal" class="modal">
-            <div class="modal-content">
-                <h3>Ajouter une nouvelle question</h3>
-                <input v-model="newQuestionTitle" placeholder="Titre de la question" />
-                <div class="modal-actions">
-                    <button @click="addQuestion">Valider</button>
-                    <button @click="showAddQuestionModal = false">Annuler</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal d'édition de questionnaire -->
-        <div v-if="showEditQuestionnaireModal" class="modal">
-            <div class="modal-content">
-                <h3>Modifier le questionnaire</h3>
-                <input v-model="editedQuestionnaireName" placeholder="Nom du questionnaire" />
-                <div class="modal-actions">
-                    <button @click="updateQuestionnaire">Valider</button>
-                    <button @click="showEditQuestionnaireModal = false">Annuler</button>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="questionnaire-actions">
+      <button @click="showAddQuestionModal = true">
+        Ajouter une question
+      </button>
+      <button @click="editQuestionnaire">
+        Modifier le questionnaire
+      </button>
+      <button @click="deleteCurrentQuestionnaire">
+        Supprimer le questionnaire
+      </button>
+    </div>
+
+    <!-- Modal d'ajout de question -->
+    <div v-if="showAddQuestionModal" class="modal">
+      <div class="modal-content">
+        <h3>Ajouter une nouvelle question</h3>
+        <input v-model="newQuestionTitle" placeholder="Titre de la question" />
+        <div class="modal-actions">
+          <button @click="addQuestion">Valider</button>
+          <button @click="showAddQuestionModal = false">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal d'édition de questionnaire -->
+    <div v-if="showEditQuestionnaireModal" class="modal">
+      <div class="modal-content">
+        <h3>Modifier le questionnaire</h3>
+        <input v-model="editedQuestionnaireName" placeholder="Nom du questionnaire" />
+        <div class="modal-actions">
+          <button @click="updateQuestionnaire">Valider</button>
+          <button @click="showEditQuestionnaireModal = false">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -71,11 +71,13 @@ export default {
     const loading = ref(true)
     const error = ref(null)
 
-    // Modals
     const showAddQuestionModal = ref(false)
     const showEditQuestionnaireModal = ref(false)
     const newQuestionTitle = ref('')
     const editedQuestionnaireName = ref('')
+
+    const isEditing = ref(false)
+    const currentQuestionId = ref(null)
 
     async function fetchQuestions() {
       if (!props.questionnaire.id) return
@@ -94,19 +96,34 @@ export default {
       if (!props.questionnaire.id || !newQuestionTitle.value.trim()) return
 
       try {
-        const newQuestion = {
-          id: null,
-          title: newQuestionTitle.value,
-          order: questions.value.length + 1,
-          type: 'text'
+        if (isEditing.value) {
+          const questionToUpdate = questions.value.find(q => q.id === currentQuestionId.value)
+          if (questionToUpdate) {
+            const updatedQuestion = {
+              ...questionToUpdate,
+              title: newQuestionTitle.value
+            }
+            await apiService.updateQuestion(props.questionnaire.id, updatedQuestion)
+          }
+        } else {
+          const newQuestion = {
+            id: null,
+            title: newQuestionTitle.value,
+            order: questions.value.length + 1,
+            type: 'text'
+          }
+          await apiService.createQuestion(props.questionnaire.id, newQuestion)
         }
-        
-        await apiService.createQuestion(props.questionnaire.id, newQuestion)
+
         await fetchQuestions()
         showAddQuestionModal.value = false
         newQuestionTitle.value = ''
+        isEditing.value = false
+        currentQuestionId.value = null
       } catch (err) {
-        error.value = 'Erreur lors de l\'ajout de la question'
+        error.value = isEditing.value
+          ? 'Erreur lors de la mise à jour de la question'
+          : 'Erreur lors de l\'ajout de la question'
       }
     }
 
@@ -122,7 +139,10 @@ export default {
     }
 
     function editQuestion(question) {
-      console.log('Éditer la question', question)
+      newQuestionTitle.value = question.title
+      currentQuestionId.value = question.id
+      isEditing.value = true
+      showAddQuestionModal.value = true
     }
 
     function editQuestionnaire() {
@@ -168,6 +188,8 @@ export default {
       showEditQuestionnaireModal,
       newQuestionTitle,
       editedQuestionnaireName,
+      isEditing,
+      currentQuestionId,
       addQuestion,
       deleteQuestion,
       editQuestion,
@@ -181,57 +203,57 @@ export default {
 
 <style scoped>
 .question-list {
-    max-width: 800px;
-    margin: 0 auto;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .question-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 .question-details {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .question-actions {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .questionnaire-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 /* Modal styles (same as QuestionnaireList) */
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    width: 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
 }
 
 .modal-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 </style>
