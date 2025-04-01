@@ -4,17 +4,11 @@
     <div v-if="loading" class="loading">Chargement...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
-      <div v-for="question in questions" :key="question.id" class="question-item">
-        <div class="question-details">
-          <h3>{{ question.title }}</h3>
-          <p>Ordre: {{ question.order }}</p>
-          <p>Type: {{ question.type }}</p>
-        </div>
-        <div class="question-actions">
-          <button @click="editQuestion(question)">Modifier</button>
-          <button @click="deleteQuestion(question)">Supprimer</button>
-        </div>
-      </div>
+      <QuestionItems 
+        :questions="questions" 
+        @edit="editQuestion" 
+        @delete="deleteQuestion"
+      />
     </div>
     <div class="questionnaire-actions">
       <button @click="showAddQuestionModal = true">
@@ -31,7 +25,7 @@
     <!-- Modal d'ajout de question -->
     <div v-if="showAddQuestionModal" class="modal">
       <div class="modal-content">
-        <h3>Ajouter une nouvelle question</h3>
+        <h3>{{ isEditing ? 'Modifier la question' : 'Ajouter une nouvelle question' }}</h3>
         <input v-model="newQuestionTitle" placeholder="Titre de la question" />
         <div class="modal-actions">
           <button @click="addQuestion">Valider</button>
@@ -57,8 +51,12 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { apiService } from '@/services/apiService'
+import QuestionItems from '@/components/QuestionItems.vue'
 
 export default {
+  components: {
+    QuestionItems
+  },
   props: {
     questionnaire: {
       type: Object,
@@ -207,31 +205,13 @@ export default {
   margin: 0 auto;
 }
 
-.question-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-
-.question-details {
-  flex-grow: 1;
-}
-
-.question-actions {
-  display: flex;
-  gap: 10px;
-}
-
 .questionnaire-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-/* Modal styles (same as QuestionnaireList) */
+/* Modal styles */
 .modal {
   position: fixed;
   top: 0;
