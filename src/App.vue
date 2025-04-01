@@ -5,9 +5,18 @@
       <b>Une erreur s'est produite :</b> {{ error }}
     </div>
 
-    <QuestionnaireList v-if="!selectedQuestionnaire" @select="selectQuestionnaire" />
+    <QuestionnaireList 
+      v-if="!selectedQuestionnaire" 
+      @select="selectQuestionnaire"
+      ref="questionnaireListRef"
+    />
 
-    <QuestionList v-else :questionnaire="selectedQuestionnaire" @back="deselectQuestionnaire" />
+    <QuestionList 
+      v-else 
+      :questionnaire="selectedQuestionnaire" 
+      @back="deselectQuestionnaire"
+      @update="updateSelectedQuestionnaire"
+    />
   </div>
 </template>
 
@@ -24,20 +33,37 @@ export default {
   setup() {
     const selectedQuestionnaire = ref(null)
     const error = ref(null)
+    const questionnaireListRef = ref(null)
 
     function selectQuestionnaire(questionnaire) {
-      selectedQuestionnaire.value = questionnaire
+      // Créer une copie pour éviter les références partagées
+      selectedQuestionnaire.value = {...questionnaire}
     }
 
     function deselectQuestionnaire() {
       selectedQuestionnaire.value = null
+      
+      // Rafraîchir la liste des questionnaires lors du retour
+      if (questionnaireListRef.value && 
+          typeof questionnaireListRef.value.fetchQuestionnaires === 'function') {
+        questionnaireListRef.value.fetchQuestionnaires()
+      }
+    }
+    
+    function updateSelectedQuestionnaire(updatedQuestionnaire) {
+      // Mettre à jour l'objet questionnaire sélectionné
+      if (updatedQuestionnaire && updatedQuestionnaire.id) {
+        selectedQuestionnaire.value = {...updatedQuestionnaire}
+      }
     }
 
     return {
       selectedQuestionnaire,
       error,
       selectQuestionnaire,
-      deselectQuestionnaire
+      deselectQuestionnaire,
+      updateSelectedQuestionnaire,
+      questionnaireListRef
     }
   }
 }

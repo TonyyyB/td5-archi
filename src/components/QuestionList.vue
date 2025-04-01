@@ -20,6 +20,9 @@
       <button @click="deleteCurrentQuestionnaire">
         Supprimer le questionnaire
       </button>
+      <button @click="$emit('back')">
+        Retour à la liste
+      </button>
     </div>
 
     <!-- Modal d'ajout de question -->
@@ -29,7 +32,7 @@
         <input v-model="newQuestionTitle" placeholder="Titre de la question" />
         <div class="modal-actions">
           <button @click="addQuestion">Valider</button>
-          <button @click="showAddQuestionModal = false">Annuler</button>
+          <button @click="cancelQuestionEdit">Annuler</button>
         </div>
       </div>
     </div>
@@ -49,7 +52,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { apiService } from '@/services/apiService'
 import QuestionItems from '@/components/QuestionItems.vue'
 
@@ -63,7 +66,7 @@ export default {
       required: true
     }
   },
-  emits: ['back'],
+  emits: ['back', 'update'],
   setup(props, { emit }) {
     const questions = ref([])
     const loading = ref(true)
@@ -77,6 +80,13 @@ export default {
     const isEditing = ref(false)
     const currentQuestionId = ref(null)
 
+    // Observer les changements de questionnaire pour recharger les questions
+    watch(() => props.questionnaire.id, (newId, oldId) => {
+      if (newId && newId !== oldId) {
+        fetchQuestions();
+      }
+    });
+
     async function fetchQuestions() {
       if (!props.questionnaire.id) return
 
@@ -88,6 +98,13 @@ export default {
         error.value = 'Erreur lors du chargement des questions'
         loading.value = false
       }
+    }
+
+    function cancelQuestionEdit() {
+      showAddQuestionModal.value = false
+      isEditing.value = false
+      newQuestionTitle.value = ''
+      currentQuestionId.value = null
     }
 
     async function addQuestion() {
@@ -113,11 +130,9 @@ export default {
           await apiService.createQuestion(props.questionnaire.id, newQuestion)
         }
 
+        // Rafraîchir les questions
         await fetchQuestions()
-        showAddQuestionModal.value = false
-        newQuestionTitle.value = ''
-        isEditing.value = false
-        currentQuestionId.value = null
+        cancelQuestionEdit()
       } catch (err) {
         error.value = isEditing.value
           ? 'Erreur lors de la mise à jour de la question'
@@ -159,6 +174,10 @@ export default {
           name: editedQuestionnaireName.value
         }
         await apiService.updateQuestionnaire(updatedQuestionnaire)
+        
+        // Émettre un événement pour que le parent mette à jour son état
+        emit('update', {...updatedQuestionnaire})
+        
         showEditQuestionnaireModal.value = false
       } catch (err) {
         error.value = 'Erreur lors de la mise à jour du questionnaire'
@@ -193,7 +212,8 @@ export default {
       editQuestion,
       editQuestionnaire,
       updateQuestionnaire,
-      deleteCurrentQuestionnaire
+      deleteCurrentQuestionnaire,
+      cancelQuestionEdit
     }
   }
 }

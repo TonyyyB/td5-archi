@@ -58,9 +58,17 @@ export default {
       
       try {
         const newQuestionnaire = await apiService.createQuestionnaire(newQuestionnaireName.value)
-        questionnaires.value.push(newQuestionnaire)
+        
+        // Rafraîchir toute la liste au lieu de simplement ajouter l'élément
+        await fetchQuestionnaires()
+        
         showCreateModal.value = false
         newQuestionnaireName.value = ''
+        
+        // Optionnel : sélectionner automatiquement le nouveau questionnaire
+        if (newQuestionnaire && newQuestionnaire.id) {
+          selectQuestionnaire(newQuestionnaire)
+        }
       } catch (err) {
         error.value = 'Erreur lors de la création du questionnaire'
       }
@@ -79,7 +87,8 @@ export default {
       showCreateModal,
       newQuestionnaireName,
       createQuestionnaire,
-      selectQuestionnaire
+      selectQuestionnaire,
+      fetchQuestionnaires // Exposer cette méthode pour permettre les rafraîchissements externes
     }
   }
 }
