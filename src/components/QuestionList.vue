@@ -25,19 +25,19 @@
       </button>
     </div>
 
-    <!-- Modal d'ajout de question -->
+    
     <div v-if="showAddQuestionModal" class="modal">
       <div class="modal-content">
         <h3>{{ isEditing ? 'Modifier la question' : 'Ajouter une nouvelle question' }}</h3>
         <input v-model="newQuestionTitle" placeholder="Titre de la question" />
         <div class="modal-actions">
-          <button @click="addQuestion">Valider</button>
           <button @click="cancelQuestionEdit">Annuler</button>
+          <button @click="addQuestion">Valider</button>
         </div>
       </div>
     </div>
 
-    <!-- Modal d'édition de questionnaire -->
+    
     <div v-if="showEditQuestionnaireModal" class="modal">
       <div class="modal-content">
         <h3>Modifier le questionnaire</h3>
@@ -80,7 +80,7 @@ export default {
     const isEditing = ref(false)
     const currentQuestionId = ref(null)
 
-    // Observer les changements de questionnaire pour recharger les questions
+    
     watch(() => props.questionnaire.id, (newId, oldId) => {
       if (newId && newId !== oldId) {
         fetchQuestions();
@@ -130,7 +130,7 @@ export default {
           await apiService.createQuestion(props.questionnaire.id, newQuestion)
         }
 
-        // Rafraîchir les questions
+        
         await fetchQuestions()
         cancelQuestionEdit()
       } catch (err) {
@@ -175,7 +175,7 @@ export default {
         }
         await apiService.updateQuestionnaire(updatedQuestionnaire)
         
-        // Émettre un événement pour que le parent mette à jour son état
+        
         emit('update', {...updatedQuestionnaire})
         
         showEditQuestionnaireModal.value = false
@@ -231,7 +231,7 @@ export default {
   margin-top: 20px;
 }
 
-/* Modal styles */
+
 .modal {
   position: fixed;
   top: 0;

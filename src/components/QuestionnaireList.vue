@@ -17,8 +17,8 @@
         <h3>Créer un nouveau questionnaire</h3>
         <input v-model="newQuestionnaireName" placeholder="Nom du questionnaire" />
         <div class="modal-actions">
-          <button @click="createQuestionnaire">Valider</button>
           <button @click="showCreateModal = false">Annuler</button>
+          <button @click="createQuestionnaire">Valider</button>
         </div>
       </div>
     </div>
@@ -59,13 +59,13 @@ export default {
       try {
         const newQuestionnaire = await apiService.createQuestionnaire(newQuestionnaireName.value)
         
-        // Rafraîchir toute la liste au lieu de simplement ajouter l'élément
+        
         await fetchQuestionnaires()
         
         showCreateModal.value = false
         newQuestionnaireName.value = ''
         
-        // Optionnel : sélectionner automatiquement le nouveau questionnaire
+        
         if (newQuestionnaire && newQuestionnaire.id) {
           selectQuestionnaire(newQuestionnaire)
         }
@@ -88,7 +88,7 @@ export default {
       newQuestionnaireName,
       createQuestionnaire,
       selectQuestionnaire,
-      fetchQuestionnaires // Exposer cette méthode pour permettre les rafraîchissements externes
+      fetchQuestionnaires 
     }
   }
 }

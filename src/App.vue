@@ -36,14 +36,14 @@ export default {
     const questionnaireListRef = ref(null)
 
     function selectQuestionnaire(questionnaire) {
-      // Créer une copie pour éviter les références partagées
+      
       selectedQuestionnaire.value = {...questionnaire}
     }
 
     function deselectQuestionnaire() {
       selectedQuestionnaire.value = null
       
-      // Rafraîchir la liste des questionnaires lors du retour
+      
       if (questionnaireListRef.value && 
           typeof questionnaireListRef.value.fetchQuestionnaires === 'function') {
         questionnaireListRef.value.fetchQuestionnaires()
@@ -51,7 +51,7 @@ export default {
     }
     
     function updateSelectedQuestionnaire(updatedQuestionnaire) {
-      // Mettre à jour l'objet questionnaire sélectionné
+      
       if (updatedQuestionnaire && updatedQuestionnaire.id) {
         selectedQuestionnaire.value = {...updatedQuestionnaire}
       }
