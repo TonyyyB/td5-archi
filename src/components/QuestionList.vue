@@ -4,11 +4,7 @@
     <div v-if="loading" class="loading">Chargement...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
-      <QuestionItems 
-        :questions="questions" 
-        @edit="editQuestion" 
-        @delete="deleteQuestion"
-      />
+      <QuestionItems :questions="questions" @edit="editQuestion" @delete="deleteQuestion" />
     </div>
     <div class="questionnaire-actions">
       <button @click="showAddQuestionModal = true">
@@ -25,7 +21,7 @@
       </button>
     </div>
 
-    
+
     <div v-if="showAddQuestionModal" class="modal">
       <div class="modal-content">
         <h3>{{ isEditing ? 'Modifier la question' : 'Ajouter une nouvelle question' }}</h3>
@@ -37,7 +33,7 @@
       </div>
     </div>
 
-    
+
     <div v-if="showEditQuestionnaireModal" class="modal">
       <div class="modal-content">
         <h3>Modifier le questionnaire</h3>
@@ -80,7 +76,7 @@ export default {
     const isEditing = ref(false)
     const currentQuestionId = ref(null)
 
-    
+
     watch(() => props.questionnaire.id, (newId, oldId) => {
       if (newId && newId !== oldId) {
         fetchQuestions();
@@ -130,7 +126,7 @@ export default {
           await apiService.createQuestion(props.questionnaire.id, newQuestion)
         }
 
-        
+
         await fetchQuestions()
         cancelQuestionEdit()
       } catch (err) {
@@ -174,10 +170,10 @@ export default {
           name: editedQuestionnaireName.value
         }
         await apiService.updateQuestionnaire(updatedQuestionnaire)
-        
-        
-        emit('update', {...updatedQuestionnaire})
-        
+
+
+        emit('update', { ...updatedQuestionnaire })
+
         showEditQuestionnaireModal.value = false
       } catch (err) {
         error.value = 'Erreur lors de la mise à jour du questionnaire'

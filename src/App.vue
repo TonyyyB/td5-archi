@@ -5,18 +5,10 @@
       <b>Une erreur s'est produite :</b> {{ error }}
     </div>
 
-    <QuestionnaireList 
-      v-if="!selectedQuestionnaire" 
-      @select="selectQuestionnaire"
-      ref="questionnaireListRef"
-    />
+    <QuestionnaireList v-if="!selectedQuestionnaire" @select="selectQuestionnaire" ref="questionnaireListRef" />
 
-    <QuestionList 
-      v-else 
-      :questionnaire="selectedQuestionnaire" 
-      @back="deselectQuestionnaire"
-      @update="updateSelectedQuestionnaire"
-    />
+    <QuestionList v-else :questionnaire="selectedQuestionnaire" @back="deselectQuestionnaire"
+      @update="updateSelectedQuestionnaire" />
   </div>
 </template>
 
@@ -36,24 +28,24 @@ export default {
     const questionnaireListRef = ref(null)
 
     function selectQuestionnaire(questionnaire) {
-      
-      selectedQuestionnaire.value = {...questionnaire}
+
+      selectedQuestionnaire.value = { ...questionnaire }
     }
 
     function deselectQuestionnaire() {
       selectedQuestionnaire.value = null
-      
-      
-      if (questionnaireListRef.value && 
-          typeof questionnaireListRef.value.fetchQuestionnaires === 'function') {
+
+
+      if (questionnaireListRef.value &&
+        typeof questionnaireListRef.value.fetchQuestionnaires === 'function') {
         questionnaireListRef.value.fetchQuestionnaires()
       }
     }
-    
+
     function updateSelectedQuestionnaire(updatedQuestionnaire) {
-      
+
       if (updatedQuestionnaire && updatedQuestionnaire.id) {
-        selectedQuestionnaire.value = {...updatedQuestionnaire}
+        selectedQuestionnaire.value = { ...updatedQuestionnaire }
       }
     }
 

@@ -16,8 +16,8 @@ export const apiService = {
   },
 
   async updateQuestionnaire(questionnaire) {
-    const response = await axios.put(`${BASE_URL}/questionnaires/${questionnaire.id}`, { 
-      name: questionnaire.name 
+    const response = await axios.put(`${BASE_URL}/questionnaires/${questionnaire.id}`, {
+      name: questionnaire.name
     })
     return response.data
   },

@@ -3,15 +3,11 @@
     <h2>Mes Questionnaires</h2>
     <div v-if="loading" class="loading">Chargement...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    
-    <QuestionnaireItems 
-      v-else
-      :questionnaires="questionnaires"
-      @select="selectQuestionnaire"
-    />
-    
+
+    <QuestionnaireItems v-else :questionnaires="questionnaires" @select="selectQuestionnaire" />
+
     <button @click="showCreateModal = true">Créer un questionnaire</button>
-          
+
     <div v-if="showCreateModal" class="modal">
       <div class="modal-content">
         <h3>Créer un nouveau questionnaire</h3>
@@ -41,7 +37,7 @@ export default {
     const error = ref(null)
     const showCreateModal = ref(false)
     const newQuestionnaireName = ref('')
-    
+
     async function fetchQuestionnaires() {
       try {
         loading.value = true
@@ -52,20 +48,20 @@ export default {
         loading.value = false
       }
     }
-    
+
     async function createQuestionnaire() {
       if (!newQuestionnaireName.value.trim()) return
-      
+
       try {
         const newQuestionnaire = await apiService.createQuestionnaire(newQuestionnaireName.value)
-        
-        
+
+
         await fetchQuestionnaires()
-        
+
         showCreateModal.value = false
         newQuestionnaireName.value = ''
-        
-        
+
+
         if (newQuestionnaire && newQuestionnaire.id) {
           selectQuestionnaire(newQuestionnaire)
         }
@@ -73,13 +69,13 @@ export default {
         error.value = 'Erreur lors de la création du questionnaire'
       }
     }
-    
+
     function selectQuestionnaire(questionnaire) {
       emit('select', questionnaire)
     }
-    
+
     onMounted(fetchQuestionnaires)
-    
+
     return {
       questionnaires,
       loading,
